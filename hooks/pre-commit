@@ -1,0 +1,17 @@
+#!/bin/bash
+echo "Running lint checks before commit..."
+
+# Run go vet
+if ! go vet ./...; then
+    echo "go vet failed! Fix the issues before committing."
+    exit 1
+fi
+
+# Check formatting
+if [ -n "$(gofmt -d .)" ]; then
+    echo "Code is not formatted properly. Run 'gofmt -w .' to fix."
+    exit 1
+fi
+
+echo "Lint checks passed!"
+exit 0

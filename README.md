@@ -121,3 +121,20 @@ The data is transmitted in binary format over TCP between clients and servers. E
 | `4` | Not leader / redirect to leader |
 | `5` | Lock expired (for RENEW/RELEASE) |
 | `6+` | Reserved for future errors |
+
+## Development Setup
+
+### Git Hooks
+
+This project includes Git hooks to ensure code quality. To set them up:
+
+```bash
+./hooks/install-hooks.sh
+```
+
+This installs both pre-commit and pre-push hooks:
+
+- **Pre-commit**: Runs linting checks (go vet + code formatting)
+- **Pre-push**: Runs all tests before allowing pushes
+
+If any checks fail, the commit/push will be aborted.
