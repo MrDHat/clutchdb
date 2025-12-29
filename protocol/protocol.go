@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+
+	"github.com/mrdhat/clutchdb/errors"
 )
 
 // Command constants
@@ -11,16 +13,6 @@ const (
 	ACQUIRE = 1 // Acquire lock
 	RENEW   = 2 // Renew lock
 	RELEASE = 3 // Release lock
-)
-
-// Response status constants (from README)
-const (
-	STATUS_SUCCESS         = 0 // Success
-	STATUS_LOCK_HELD       = 1 // Lock already held (ACQUIRE failed)
-	STATUS_INVALID_REQUEST = 2 // Invalid request / malformed
-	STATUS_NOT_LEADER      = 3 // Not leader / redirect to leader
-	STATUS_LOCK_EXPIRED    = 4 // Lock expired (for RENEW/RELEASE)
-	// 5+ reserved for future errors
 )
 
 // Request represents the wire protocol request
@@ -34,9 +26,9 @@ type Request struct {
 
 // Response represents the wire protocol response
 type Response struct {
-	Status       uint8  // Response status code
-	FencingToken uint64 // Fencing token (used by ACQUIRE and RENEW)
-	ExpiresAt    uint64 // Expiration timestamp in milliseconds (used by ACQUIRE and RENEW)
+	Status       errors.StatusCode // Response status code
+	FencingToken uint64            // Fencing token (used by ACQUIRE and RENEW)
+	ExpiresAt    uint64            // Expiration timestamp in milliseconds (used by ACQUIRE and RENEW)
 }
 
 // WriteRequest encodes a Request to the wire format and writes it to w
@@ -91,7 +83,7 @@ func ReadRequest(r io.Reader) (*Request, error) {
 func WriteResponse(w io.Writer, resp *Response) error {
 	var buf [17]byte
 
-	buf[0] = resp.Status
+	buf[0] = byte(resp.Status)
 	binary.BigEndian.PutUint64(buf[1:9], resp.FencingToken)
 	binary.BigEndian.PutUint64(buf[9:17], resp.ExpiresAt)
 
@@ -106,7 +98,7 @@ func ReadResponse(r io.Reader) (*Response, error) {
 		return nil, err
 	}
 
-	status := buf[0]
+	status := errors.StatusCode(buf[0])
 	fencingToken := binary.BigEndian.Uint64(buf[1:9])
 	expiresAt := binary.BigEndian.Uint64(buf[9:17])
 
@@ -122,7 +114,7 @@ func ReadRequestOrErrorResponse(r io.Reader) (*Request, *Response) {
 	req, err := ReadRequest(r)
 	if err != nil {
 		return nil, &Response{
-			Status:       STATUS_INVALID_REQUEST,
+			Status:       errors.STATUS_INVALID_REQUEST,
 			FencingToken: 0,
 			ExpiresAt:    0,
 		}

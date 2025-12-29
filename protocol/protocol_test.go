@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/mrdhat/clutchdb/errors"
 )
 
 func TestRequestRoundTrip(t *testing.T) {
@@ -192,8 +193,8 @@ func TestReadRequestOrErrorResponse(t *testing.T) {
 		if errResp == nil {
 			t.Fatal("Expected error response, got nil")
 		}
-		if errResp.Status != STATUS_INVALID_REQUEST {
-			t.Errorf("Expected status %d, got %d", STATUS_INVALID_REQUEST, errResp.Status)
+		if errResp.Status != errors.STATUS_INVALID_REQUEST {
+			t.Errorf("Expected status %d, got %d", errors.STATUS_INVALID_REQUEST, errResp.Status)
 		}
 	})
 }
