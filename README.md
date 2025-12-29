@@ -116,7 +116,8 @@ The data is transmitted in binary format over TCP between clients and servers. E
 | ----------- | ---------------------------------- |
 | `0` | Success |
 | `1` | Lock already held (ACQUIRE failed) |
-| `2` | Invalid request / malformed |
-| `3` | Not leader / redirect to leader |
-| `4` | Lock expired (for RENEW/RELEASE) |
-| 5+ | Reserved for future errors |
+| `2` | Lock not held (for RENEW) |
+| `3` | Invalid request / malformed |
+| `4` | Not leader / redirect to leader |
+| `5` | Lock expired (for RENEW/RELEASE) |
+| `6+` | Reserved for future errors |

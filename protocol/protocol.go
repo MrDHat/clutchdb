@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/mrdhat/clutchdb/errors"
+	"github.com/mrdhat/clutchdb/clutcherrors"
 )
 
 // Command constants
@@ -26,9 +26,9 @@ type Request struct {
 
 // Response represents the wire protocol response
 type Response struct {
-	Status       errors.StatusCode // Response status code
-	FencingToken uint64            // Fencing token (used by ACQUIRE and RENEW)
-	ExpiresAt    uint64            // Expiration timestamp in milliseconds (used by ACQUIRE and RENEW)
+	Status       clutcherrors.StatusCode // Response status code
+	FencingToken uint64                  // Fencing token (used by ACQUIRE and RENEW)
+	ExpiresAt    uint64                  // Expiration timestamp in milliseconds (used by ACQUIRE and RENEW)
 }
 
 // WriteRequest encodes a Request to the wire format and writes it to w
@@ -98,7 +98,7 @@ func ReadResponse(r io.Reader) (*Response, error) {
 		return nil, err
 	}
 
-	status := errors.StatusCode(buf[0])
+	status := clutcherrors.StatusCode(buf[0])
 	fencingToken := binary.BigEndian.Uint64(buf[1:9])
 	expiresAt := binary.BigEndian.Uint64(buf[9:17])
 
@@ -114,7 +114,7 @@ func ReadRequestOrErrorResponse(r io.Reader) (*Request, *Response) {
 	req, err := ReadRequest(r)
 	if err != nil {
 		return nil, &Response{
-			Status:       errors.STATUS_INVALID_REQUEST,
+			Status:       clutcherrors.STATUS_INVALID_REQUEST,
 			FencingToken: 0,
 			ExpiresAt:    0,
 		}
