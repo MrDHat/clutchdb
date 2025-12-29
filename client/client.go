@@ -6,7 +6,7 @@ import (
 )
 
 type Client interface {
-	Acquire(ctx context.Context, lock string, ttl time.Duration) (uint64, error)
-	Renew(ctx context.Context, lock string, ttl time.Duration) (uint64, error)
+	Acquire(ctx context.Context, lock string, ttl time.Duration) (uint64, uint64, error)
+	Renew(ctx context.Context, lock string, ttl time.Duration) (uint64, uint64, error)
 	Release(ctx context.Context, lock string) error
 }
